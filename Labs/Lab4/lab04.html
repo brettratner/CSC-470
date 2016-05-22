@@ -1,0 +1,90 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Lab 04</title>
+    <style>
+      table {
+        margin-left      : 10px;
+      }
+      #swatch {
+        border           : 1px solid black;
+        min-width        : 100px; 
+        height           : 100px; 
+        background-color : rgb(0,0,0);
+      }
+    </style>
+  </head>
+  <body>
+    <table>
+      <tr>
+        <td>Red:</td>
+        <td><input id="R" type="range" value="0" min="0" max="255"></td>
+      </tr><tr>
+        <td>Green:</td>
+        <td><input id="G" type="range" value="0" min="0" max="255"></td>
+      </tr><tr>
+        <td>Blue:</td>
+        <td><input id="B" type="range" value="0" min="0" max="255"></td>
+      </tr><tr>
+        <td colspan='2'>Color: <span id="clr"></span></td>
+      </tr><tr>
+        <td id="swatch" colspan='2'></td>
+      <tr>
+    </table>
+
+    <script type="text/javascript">
+
+/**********************************************************************************************************************
+* Brett Ratner
+* This assignment will change colors based on the three color sliders. It will update the background colors value to be
+* set to the current RGB color value. 
+***********************************************************************************************************************/
+//starts with a defensive semi-colin and starts the IIFE
+;(function(){
+  //Creates a function that will be listening for the events(when you move the scorll)
+  var createListeners = function (id){
+    console.log(id);
+    //Will get the id of the elements through a paramter which will be listening for a change in values
+    document.getElementById(id).addEventListener("change", function(){
+      switch(id){
+        //when the id is R
+        case"R": 
+                  //This will change the  red color that will be displayed in the swatch 
+                document.getElementById("swatch").style.backgroundColor = ("rgb(" + document.getElementById(id).value + "," + document.getElementById("G").value + "," + document.getElementById("B").value + ")");
+                 //This will display the change in the red value and update the html text being shown
+                document.getElementById("clr").innerHTML = "rgb(" +  document.getElementById(id).value + "," + document.getElementById("G").value + "," + document.getElementById("B").value + ")";
+                break;
+
+        //when the id is G
+        case"G":
+                   //This will change the green color that will be displayed in the swatch 
+                document.getElementById("swatch").style.backgroundColor = ("rgb(" + document.getElementById("R").value + "," + document.getElementById(id).value + "," + document.getElementById("B").value + ")");
+                   //This will display the change in the green value and update the html text being shown
+                document.getElementById("clr").innerHTML = "rgb(" + document.getElementById("R").value+ "," + document.getElementById(id).value + "," + document.getElementById("B").value + ")";
+                break;
+        //when the id is B
+        case"B":              
+                  //This will change the  blue color that will be displayed in the swatch 
+                document.getElementById("swatch").style.backgroundColor = ("rgb(" + document.getElementById("R").value + "," + document.getElementById("G").value + "," + document.getElementById(id).value + ")");
+                  //This will display the change in the blue value and update the html text being shown
+                document.getElementById("clr").innerHTML = "rgb(" + document.getElementById("R").value + "," + document.getElementById("G").value + "," + document.getElementById(id).value + ")";
+                break;
+
+      }
+    });
+  }
+  //This calls the function for the ids for the red slider, the green slider, and the blue slider.
+  createListeners("R");
+  createListeners("G");
+  createListeners("B");
+
+
+//This closes the IIFE
+}) ();
+
+
+
+    </script>
+  </body>
+</html>

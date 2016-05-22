@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+       <meta charset="UTF-8"> 
+	   <title>Lab10</title>
+        <style>
+            #grey {
+                margin-left: 145px;
+                position: relative;
+                font-size: 30px;
+                border-radius: 12px;
+            }
+        </style>
+</head>
+<body>
+    <h1>Lab 10 - Make America Grey Again</h1>
+    <p><canvas id="cvs" width="1" height="1"></canvas></p>
+    <p><button id="grey">GREY IT UP</button></p>
+    <script type="text/javascript">
+/************************************************************************************
+ * Brett Ratner
+ * Lab 10
+ * The purpose of the assignment is to load in an image into canvas and then
+ * make use of webworkers to change the color of that image to grayscale.
+*************************************************************************************/
+
+        (function() {
+            var el = document.getElementById.bind(document);
+            var cvs = el('cvs');
+            var ctx = cvs.getContext('2d');
+            var button = el('grey');
+            // Load an image into an in-memory Image.
+            var img = new Image();
+            img.src = "america.jpg";
+
+            //loads in the image and will then draw it on the canvas
+            img.onload = function(e) {
+                // Once loaded, resize canvas to match image
+                cvs.width = img.width;
+                cvs.height = img.height;
+                // Draw image onto canvas
+                ctx.drawImage(img, 0, 0);
+            }
+
+            var webworker = new Worker("webworker.js");
+
+            //button onlick
+            button.onclick = function(e){
+                var durl = ctx.getImageData(0, 0, cvs.width, cvs.height);
+                    // get clamped image data array
+                    var array = durl.data;
+                    // create object with array
+                    var data = { dataURL: array };
+                    
+                    //post obj to web worker
+                    webworker.postMessage(data);
+            }
+
+
+
+            // listen for messages from worker
+            webworker.onmessage = function(e){
+                // create image data with same canvas size
+                var imageData = ctx.createImageData(cvs.width, cvs.height);
+                // sets the data from message
+                imageData.data.set(e.data);
+                // puts image on canvas
+                ctx.putImageData(imageData, 0, 0);
+
+            }
+
+        })();
+    </script>
+</body>
+</html>

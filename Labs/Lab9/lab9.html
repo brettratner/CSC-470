@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+    <script>
+    /***********************************************************************************************
+	 * Brett Ratner
+	 * Lab09
+	 * The purpose of this lab is to asynchronously load in an array of strings that will 
+	 * get information from three different HTML pages and appending it to this web page's
+	 * body tag. 
+    ***********************************************************************************************/
+    (function() {
+    // an array of the pages that it will get getting info from 
+    var files = ["page1.html", "page2.html", "page3.html"];
+
+    /*
+	 * Checking to make sure that there are files to get information from.
+	 * It will then create an HTTP Request and load in the information from the 
+	 * the other pages and creates new inner html on the page.
+    */
+    var loadFiles = function(files) {
+        if (files.length < 1) {
+            return [];
+        }
+
+        var xhr = new XMLHttpRequest();
+        var file = files.shift();
+        // maks the type of the response text that will be appended.
+        xhr.responseType = "text";
+        xhr.onload = tasks;
+        //sets up to where to get the inormation from and then will remove that element from the array
+        xhr.open("GET", file);
+        //gets the information from that page
+        xhr.send();
+
+         function tasks() {
+            setTimeout(function() {
+                console.log(xhr.response);
+                document.body.innerHTML += (xhr.response);
+                return loadFiles(files);
+            }, 0);
+        }
+    }
+
+
+
+    loadFiles(files);
+     }) ();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+	<head>
+
+		<meta charset="UTF-8"> 
+		<title>Lab03</title> 
+		<!-- centers the title on the page -->
+		<style>
+		p{text-align: center;
+		margin-left: auto;
+		margin-right: auto;}
+		</style>
+	</head> 
+	<body> 
+		<p>LAB 3</p> 
+		
+		<script type="text/javascript">
+/************************************************************************************************************************************************************************************
+* Lab03.html
+* Brett Ratner 
+* The purpose of this assignment is to add an image to the dom, width a set height and width 
+* attribute values. Then in the console you can run the function scaleImage() with a number
+* to make the image larger or smaller by scale. 
+*************************************************************************************************************************************************************************************/
+
+
+	var imageName, imageHeight, ImageWidth;	
+		//creates the function to load in the image that takes in an image name, the height of the image and the image width. 
+			var LoadImage = function(imageName, imageHeight, ImageWidth){
+		//creates an iamage with the element name of img.
+	var element = document.createElement("img");
+		//sets the attributes of the image, including the image name, then height, then width.
+    element.setAttribute("src", imageName);
+    element.setAttribute("height", imageHeight);
+    element.setAttribute("width", ImageWidth);
+    document.body.appendChild(element);
+}
+
+		//creates the function to scale the image 
+			function scaleImage(size) {
+				//Goes through the dom and gets all the elements with the tag name of 'img'
+				var allImg = document.getElementsByTagName('img')
+			 	
+			 	//goes through all the img tages and will change the attributes of the hight and width by the size mulitplyer.
+				for( var i = 0;  i < allImg.length; i++){
+
+					allImg[i].setAttribute('width', "" + (parseInt(allImg[i].getAttribute('width')) * size));
+					allImg[i].setAttribute('height', "" + (parseInt(allImg[i].getAttribute('height')) * size));
+	
+				}
+			 }  
+				
+			 //loads the image
+		LoadImage("brettratner.jpg", 175,250);
+
+		</script> 
+	</body> 
+</html>

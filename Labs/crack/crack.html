@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PIN Crack</title>
+    <style>
+        * {
+            font-family: arial;
+        }
+        input[type=range] {
+            width: 100px;
+        }
+    </style>
+    <script type="text/javascript" src="sjcl.js">
+        // Stanford Javascript Crypto Library (SJCL)
+        // http://bitwiseshiftleft.github.io/sjcl/
+    </script>
+</head>
+<body>
+    <table>
+        <tr><td colspan="2">Real Data:</td></tr>
+        <tr><td colspan="2"><textarea id="tData" cols="30" rows="3">My secret iPhone data</textarea></td></tr>
+        <tr><td>Real PIN:</td><td><input id="tPINin" type="text" value="9999"></td></tr>
+        <tr><td># Workers:</td><td><input id="rNWorkers" type="range" min="1" max="16" value="1"><span id="sNWorkers">1</span></td></tr>
+        <tr><td><button id="bCrack">Crack</button></td><td><button id="bCancel">Cancel</button></td></tr>
+        <tr><td>Cracked PIN:</td><td><input id="tPINout" type="text"></td></tr>
+        <tr><td>Duration:</td><td><input id="tDuration" type="text"></td></tr>
+        <tr><td id="msg" colspan="2"></td></tr>
+    </table>
+
+    <script type="application/javascript">
+        (function() {
+            var el = document.getElementById.bind(document);
+
+            // Array of all Worker objects
+            var workers = [];
+
+            // Crack button event
+            el("bCrack").onclick = function (e) {
+
+                // Clear output widgets and terminate all workers
+                el('tPINout').value = '';
+                el('tDuration').value = '';
+                workers.forEach(function (w) {
+                    w.terminate();
+                });
+                workers = [];
+
+                // Get input PIN
+                var PINin = el('tPINin').value;
+                if (PINin.length < 4) {
+                    alert("PIN must be four digits");
+                    return;
+                }
+
+                // Get PIN and encrypt data
+                var data = el('tData').value;
+                var encrypted = sjcl.encrypt(PINin, data);
+
+                // Get number of workers to create
+                var nworkers = Number(el('rNWorkers').value);
+                setMsg("Running " + nworkers + " worker(s)");
+
+                // Set up all Workers
+                for (var i = 0; i < nworkers; i++) {
+                    // Create Worker object
+                    var w = new Worker('crack.js');
+
+                    // Set message event handler
+                    w.onmessage = function (e) {
+                        var PIN = e.data.PIN;
+                        var elapsed = e.data.elapsed;
+                        var name = e.data.name;
+
+                        // If the PIN was found, terminate all the remaining workers
+                        if (PIN !== null) {
+                            el('tPINout').value = PIN;
+                            el('tDuration').value = elapsed;
+                            workers.forEach(function (w) {
+                                w.terminate();
+                            });
+                            console.log(nworkers, elapsed);
+                        }
+
+                        setMsg('Worker ' + name + ' done');
+                    };
+                    // Collect in workers array
+                    workers.push(w);
+                }
+
+                // Pass out all PIN ranges to search
+                var delta = Math.ceil(10000 / nworkers);
+                var pin = 0;
+
+                for (var i = 0; i < nworkers; i++) {
+                    // Start of next PIN range
+                    var first = pin;
+
+                    // Kick off each Worker
+                    var msg = {
+                        name: ('w' + i),
+                        encrypted: encrypted,
+                        first: first,
+                        count: delta
+                    };
+                    workers[i].postMessage(msg);
+
+                    // Next start PIN
+                    pin += delta;
+                }
+
+            };
+
+            // Helper function to display a message
+            function setMsg(m) {
+                el('msg').innerHTML = m;
+            }
+
+            // Handle range change event
+            el('rNWorkers').onchange = function (e) {
+                el('sNWorkers').innerHTML = el('rNWorkers').value;
+            }
+
+            // Cancel PIN crack
+            el('bCancel').onclick = function (e) {
+                workers.forEach(function (w) {
+                    w.terminate();
+                });
+                setMsg('Terminated');
+            };
+        })();
+    </script>
+</body>
+</html>
